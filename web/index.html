@@ -47,6 +47,17 @@
 
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="./server.js"></script>
+    <script>
+        if (typeof navigator.serviceWorker !== 'undefined') {
+            
+            navigator.serviceWorker.register('sw.js').then((registration) => {
+                console.log('Service worker registration succeeded:', registration);
+            }, /*catch*/(error) => {
+                console.error(`Service worker registration failed: ${error}`);
+            });
+        }
+    </script>
+
 </body>
 
 </html>
