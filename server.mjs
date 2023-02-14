@@ -12,12 +12,59 @@ let productSchema = new mongoose.Schema({
 });
 const productModel = mongoose.model('products', productSchema);
 
+let messageSchema = new mongoose.Schema({
+    query: { type: String, required: true },
+    from: String,
+    createdOn: { type: Date, default: Date.now }
+});
+const messageModel = mongoose.model('messages', messageSchema);
+
+
 const app = express()
-// app.use(cors())
+app.use(cors())
 app.use(express.json())
 
 const port = process.env.PORT || 5001;
 
+
+
+app.post("/message", async (req, res) => {
+
+    try {
+        const body = req.body;
+        if (!body.query) {
+            res.status(400).send(` required parameter missing. example request body:
+        {
+            "query": "HI",
+        }`)
+            return;
+        }
+
+        await messageModel
+            .create({
+                query: body.query,
+                from: "user"
+            })
+
+        // TODO: send query to dialogflow and get chatbot responce
+
+        res.send({
+            message: {
+                text: "This is Hello from Chatbot"
+            }
+        })
+
+    } catch (e) {
+        console.log(e);
+        res.status(500).send({
+            message: "server error"
+        })
+
+    }
+})
+
+
+// ============================ CRUD =============================
 
 app.post("/product", (req, res) => {
 
@@ -38,12 +85,12 @@ app.post("/product", (req, res) => {
         return;
     }
 
-productModel.create({
+    productModel.create({
         name: body.name,
         price: body.price,
         category: body.category,
         description: body.description,
-},
+    },
         (err, saved) => {
             if (!err) {
                 console.log(saved);
